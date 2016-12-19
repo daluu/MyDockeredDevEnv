@@ -1,0 +1,52 @@
+alias hostip="ip route show 0.0.0.0/0 | grep -Eo 'via \S+' | awk '{ print \$2 }'"
+docker run --add-host=dockerhost:$(hostip) --rm -it debian
+
+-----------------
+
+#create a bridge
+ip link add docker0 type bridge
+#assign an IP address to it
+ip link set docker0 up
+ip addr add 172.17.0.1/16 dev docker0
+#start docker and bind the API to the bridge
+docker -d -H 172.17.0.1:4242
+#Now you can access the Docker API from your containers
+
+-----------------
+
+firewall-cmd --permanent --zone=trusted --add-interface=docker0
+firewall-cmd --permanent --zone=trusted --add-port=4243/tcp
+
+----------------
+
+docker run -v /var/run/docker.sock:/var/run/docker.sock …
+docker run -v /var/lib/mysql/mysql.sock:/mysql.sock mywebapp
+
+docker --host /etc/hosts
+
+netstat -nr | grep '^0\.0\.0\.0' | awk '{print $2}'
+
+docker run --rm -it -e HOST_IP="$(docker-osx ssh -c 'route -n' 2> /dev/null | awk '/^0.0/ { print $2 }')" debian:jessie
+
+run --add-host=dockerhost:$(ip route | awk '/docker0/ { print $NF }')  ubuntu ping -c2 dockerhost
+
+--------------
+
+#When I add the IP of the Docker bridge it works
+#First listen on port 1234 with netcat
+nc -l -p 1234
+#Get the bridge's IP
+ifconfig docker0 | grep 'inet addr'
+          inet addr:172.17.42.1  Bcast:0.0.0.0  Mask:255.255.0.0
+#Then connect
+docker run --add-host=docker:172.17.42.1 --rm -it hiromasaono/curl curl 172.17.42.1:1234
+
+---------------
+
+docker-machine ssh "${DOCKER_MACHINE_NAME}" 'echo ${SSH_CONNECTION%% *}'
+
+-------------
+
+export ipaddr=$(printf "%d." $(
+  echo $(awk '$2 == "00000000" {print $3}' /proc/net/route) | sed 's/../0x& /g' | tr ' ' '\n' | tac
+  ) | sed 's/\.$/\n/')

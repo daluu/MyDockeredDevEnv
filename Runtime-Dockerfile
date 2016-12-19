@@ -1,0 +1,130 @@
+FROM ubuntu:14.04
+
+ENV DEBIAN_FRONTEND noninteractive
+
+# get latest package installer info
+RUN apt-get update -y
+# add support to add apt-get package repos
+RUN apt-get install -y software-properties-common
+
+# *nix toolchain tools (and other CLI tools) setup
+# general tools
+RUN apt-get install -y bsdmainutils url heirloom-mailx jq nano screen shellcheck tmux unzip vim wget
+RUN wget "https://github.com/harelba/packages-for-q/raw/master/deb/q-text-as-data_1.5.0-1_all.deb?source=install_page&table=1" -O q.deb && dpkg -i q.deb && rm q.deb
+# specialty tools
+RUN wget "http://apache.mirrors.lucidnetworks.net/kafka/0.8.2.1/kafka_2.10-0.8.2.1.tgz" && tar xvzf kafka_2.10-0.8.2.1.tgz && rm kafka_2.10-0.8.2.1.tgz && mv kafka_2.10-0.8.2.1 /opt/kafka
+#RUN apt-get -y install librdkafka-dev libyajl-dev && apt-get -y install kafkacat
+#RUN wget "https://github.com/edenhill/kafkacat/archive/1.2.0.tar.gz" -O kafkacat.tar.gz && tar xvzf kafkacat.tar.gz && cd kafkacat-1.2.0 && ./bootstrap.sh && cd ../ && rm -rf kafkacat-1.2.0 && rm kafkacat.tar.gz
+
+# SCM toolchain setup
+RUN apt-get install -y git
+#RUN apt-get install -y cvs mercurial svn
+
+# java toolchain setup
+RUN apt-add-repository ppa:webupd8team/java
+RUN apt-get update -y
+# reference: http://askubuntu.com/questions/190582/installing-java-automatically-with-silent-option
+RUN apt-get install -y python-software-properties debconf-utils
+RUN echo "debconf shared/accepted-oracle-license-v1-1 select true" | debconf-set-selections
+RUN echo "debconf shared/accepted-oracle-license-v1-1 seen true" | debconf-set-selections
+RUN apt-get -y install oracle-java8-installer
+# set path JAVA_HOME as needed
+RUN export JAVA_HOME=/usr/lib/jvm/java-8-oracle/jre
+# install maven & gradle, package defaults are mvn 3.0.5, gradle X
+RUN apt-get install -y maven
+#RUN wget http://www-us.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz && tar xzvf apache-maven-3.3.9-bin.tar.gz && rm apache-maven-3.3.9-bin.tar.gz && mv apache-maven-3.3.9 /opt/maven && ln -s /opt/maven/bin/mvn /usr/local/bin/mvn
+RUN apt-get install -y gradle
+#RUN wget https://services.gradle.org/distributions/gradle-3.2.1-bin.zip && unzip gradle-3.2.1-bin.zip && rm gradle-3.2.1-bin.zip && mv gradle-3.2.1 /opt/gradle && ln -s /opt/gradle/bin/gradle /usr/local/bin/gradle
+# also set GRADLE_HOME=/opt/gradle, and perhaps set GRADLE_OPTS
+
+# for access to gcc/C/C++/make tools
+RUN apt-get install -y --reinstall autoconf automake build-essential libprotobuf-dev libsnappy-dev libtool make g++ protobuf-compiler gcc-4.8
+
+# node.js toolchain setup
+RUN curl -sL https://deb.nodesource.com/setup_4.x | bash -
+RUN apt-get install -y nodejs
+
+# python toolchain setup
+RUN apt-get install -y python2.7 python-pip python-dev libpq-dev
+RUN pip install virtualenv
+#RUN pip install robotframework, others?
+
+# ruby toolchain setup - using RVM
+RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+RUN curl -sSL https://get.rvm.io | bash -s stable --ruby
+
+# perl toolchain setup
+# already comes with Perl v5.18.2 and CPAN v1.07
+# setup CPAN as needed...
+# and install Perl modules via CPAN...
+
+# PHP toolchain setup
+RUN apt-get install -y php5-cli
+# shorter composer install
+RUN curl -O https://getcomposer.org/composer.phar && chmod +x composer.phar && mv composer.phar /usr/local/bin/composer
+# or the longer steps alternative...
+#RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+#RUN php -r "if (hash_file('SHA384', 'composer-setup.php') === 'e115a8dc7871f15d853148a7fbac7da27d6c0030b848d9b3dc09e2a0388afed865e6a3d6b3c0fad45c48e2b5fc1196ae') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+#RUN php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+#RUN chmod +x /usr/local/bin/composer
+#RUN php -r "unlink('composer-setup.php');"
+
+# go/golang toolchain setup
+RUN wget "https://storage.googleapis.com/golang/go1.7.1.linux-amd64.tar.gz" && tar -C /usr/local -xzf go1.7.1.linux-amd64.tar.gz && rm go1.7.1.linux-amd64.tar.gz
+#RUN wget "https://storage.googleapis.com/golang/go1.7.1.linux-386.tar.gz" && tar -C /usr/local -xzf go1.7.1.linux-386.tar.gz && go1.7.1.linux-386.tar.gz
+# need to pass in a volume mapping of host path to fixed docker path for go-based source code referencing
+ENV GOPATH /data/go
+
+# .NET/mono toolchain setup, including NuGet
+RUN wget "http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF" -O out && sudo apt-key add out && rm out
+# or
+#RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+RUN echo "deb http://download.mono-project.com/repo/debian wheezy main" | sudo tee /etc/apt/sources.list.d/mono-xamarin.list
+RUN apt-get update -y
+RUN apt-get install -y mono-complete
+# or after the key setup above...
+#RUN wget http://download.mono-project.com/sources/mono/mono-4.6.0.125.tar.bz2 -O mono-4.6.0.125.tar.bz2 && tar xvf mono-4.6.0.125.tar.bz2 && rm mono-4.6.0.125.tar.bz2 && cd "mono-4.6.0/" && ./configure && make && make install
+#RUN rm -rf mono-4.6.0/
+
+# set up working path
+RUN mkdir -p /opt/working/
+WORKDIR /opt/working/
+ENV HOME /opt/working/
+# set up system PATH with all the stuff installed
+ENV PATH "${PATH}:/usr/local/go/bin:/data/go/bin"
+#ENV PATH "${PATH}:/opt/gradle/bin"
+
+# Define default command
+CMD ["bash"]
+
+# more command line tools setup, dependent on the various runtimes
+#RUN gem install slop; gem install json; gem install rest-client; gem install riemann-client
+
+# install package dependencies
+COPY package.json /opt/working/
+RUN npm install
+COPY requirements.txt /opt/working/
+RUN pip install -r requirements.txt
+COPY Gemfile /opt/working/
+RUN bundle install
+COPY composer.json /opt/working/
+RUN composer install
+# NuGet deps install?...
+
+# Clean up APT when done.
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# expose any needed ports
+#EXPOSE 8000
+#EXPOSE 8080
+#EXPOSE 8888
+#EXPOSE 8081
+#EXPOSE 8082
+#EXPOSE 8083
+
+# Sample usage
+#   docker run --rm -it -p 8080:8080 -v /local/pathTo/stuff:/data/dockerPathTo/stuff MyDockeredDevEnv bash
+#   port & volume mapping is HOST:CONTAINER
+
+# Note down docker container paths to remap with paths from host for dependencies and cache
+# e.g.  maven's ~/.m2/repository, python libs, perl libs, ruby gems, global node.js modules, php libs, .NET/mono libs

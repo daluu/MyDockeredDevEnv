@@ -1,0 +1,18 @@
+version: '2'
+
+services:
+  nginx:
+    container_name: sw_nginx
+    image: nginx:latest
+    ports:
+      - 80:80
+    links:
+     - search
+    volumes:
+      - ./Web/wwwroot:/var/www/public
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    extra_hosts:
+      # requires `export DOCKERHOST="$(ifconfig en0 inet | grep "inet " | awk -F'[: ]+' '{ print $2 }')"` in ~/.bash_profile
+      - "dockerhost:$DOCKERHOST"
+      # the below maps value from StartDocker.sh
+      #- "dockerhost:${localhost}"
