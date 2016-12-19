@@ -1,0 +1,2 @@
+For increasing boot2docker VM storage/disk size
+http://learningdocker.com/resizing-boot2docker-disk-volumes/
