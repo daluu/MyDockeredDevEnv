@@ -1,0 +1,18 @@
+# https://blog.jessfraz.com/post/docker-containers-on-the-desktop/
+
+# http://stackoverflow.com/questions/16296753/can-you-run-gui-apps-in-a-docker-container
+# set up x11 & VNC to allow for jmeter GUI mode, at least when run locally with docker
+# we could later switch to just using x11 between docker & host, but for now, that doesn't quite work on Mac/Windows w/o more setup
+RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list
+RUN apt-get update
+RUN apt-get install -y --force-yes x11vnc xvfb
+RUN mkdir ~/.vnc
+# Setup a password
+RUN x11vnc -storepasswd 1234 ~/.vnc/passwd
+EXPOSE 5900
+
+# for GUI mode via VNC (debugging, getting/sending live stats)...
+#   (we could later switch to just using x11 between docker & host, but for now, that doesn't quite work on Mac/Windows w/o more setup)
+# docker run --rm -it -p 5900:5900 image_name x11vnc -forever -usepw -create
+#   after starting up the docker container with above command, connect via VNC w/ password "1234" to access the terminal (typically connecting to localhost:5900)
+#   then in the VNC terminal, run the GUI based apps you want
