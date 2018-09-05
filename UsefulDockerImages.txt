@@ -7,6 +7,7 @@ phusion/passenger-customizable:0.9.18
 phusion/baseimage:0.9.19
 java:8
 node:0.12.14
+https://github.com/anapsix/docker-oracle-java8
 
 tools
 vulpe03/cqlsh
@@ -15,6 +16,8 @@ GUI automation
 elgalu/selenium
 selenium/standalone-chrome-debug
 selenium/standalone-firefox-debug
+(and do docker run -v /dev/shm:/dev/shm w/ https://stackoverflow.com/questions/2033362/does-os-x-have-an-equivalent-to-dev-shm)
+https://blog.jessfraz.com/post/docker-containers-on-the-desktop/
 
 Load Testing/Benchmarking
 hoopla/locust
@@ -24,9 +27,20 @@ undera/taurus
 hauptmedia/docker-jmeter
 SergeyZh/docker-jmeter
 srivaths/jmeter* (http://srivaths.blogspot.com/2014/08/distrubuted-jmeter-testing-using-docker.html)
+williamyeh/wrk
 
 Security
 owasp/zap2docker-stable
+https://github.com/CISOfy/lynis
+https://github.com/eliasgranderubio/dagda
+https://github.com/anchore/anchore-engine
+
+routing
+emilevauge/traefik
+
+Rpi stuff?
+hypriot/rpi-*
+http://blog.hypriot.com/post/microservices-bliss-with-docker-and-traefik/
 
 Maybe useful?
 https://github.com/bprodoehl/docker-wan-emulator

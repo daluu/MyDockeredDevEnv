@@ -1,0 +1,3 @@
+npm install --global speed-test
+npm install --global fast-cli
+npm install --global appium

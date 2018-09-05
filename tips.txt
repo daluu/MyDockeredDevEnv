@@ -1,2 +1,29 @@
 For increasing boot2docker VM storage/disk size
 http://learningdocker.com/resizing-boot2docker-disk-volumes/
+
+https://joeshaw.org/smaller-docker-containers-for-go-apps/
+
+remove avoid setuid, setgid permissions
+FROM debian:wheezy
+RUN find / -perm +6000 -type f -exec chmod a-s {} \; \
+  || true
+# don't run apps as root in containers
+RUN groupadd -r user && useradd -r -g user user
+USER user
+
+docker run --cap-drop=ALL --cap-add=CAP_NET_ADMIN # restrict capabilities as root, adding only what is needed
+dockr run --user # no capabilities
+
+download pkgs via GPG & certs
+check pkgs in container
+docker exec $INSTANCE_ID rpm -qa | dpkg -l
+
+make filesys in image read-only (do inside image > dockerfile) OR
+docker run --read-only ...
+# avoid update instructions comments in dockerfile?
+COPY over ADD
+gosu over sudo
+
+https://codefresh.io/blog/everyday-hacks-docker
+
+https://realguess.net/2016/10/09/getting-let-s-encrypt-ssl-certificate-with-docker/
