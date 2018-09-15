@@ -11,8 +11,8 @@ RUN apt-get install -y software-properties-common
 
 # *nix toolchain tools (and other CLI tools) setup
 # general tools
-#RUN apt-get install -y bsdmainutils curl heirloom-mailx jq ministat nano screen shellcheck tmux unzip vim wget
-RUN apt-get install -y bsdmainutils curl heirloom-mailx jq ministat nano screen tmux unzip vim wget
+#RUN apt-get install -y bsdmainutils ca-certificates curl heirloom-mailx jq ministat nano screen shellcheck tmux unzip vim wget
+RUN apt-get install -y bsdmainutils ca-certificates curl heirloom-mailx jq ministat nano screen tmux unzip vim wget
 RUN wget "https://github.com/harelba/packages-for-q/raw/master/deb/q-text-as-data_1.5.0-1_all.deb?source=install_page&table=1" -O q.deb && dpkg -i q.deb && rm q.deb
 # specialty tools
 RUN wget "http://apache.mirrors.lucidnetworks.net/kafka/0.8.2.1/kafka_2.10-0.8.2.1.tgz" && tar xvzf kafka_2.10-0.8.2.1.tgz && rm kafka_2.10-0.8.2.1.tgz && mv kafka_2.10-0.8.2.1 /opt/kafka
@@ -81,8 +81,8 @@ RUN curl -O https://getcomposer.org/composer.phar && chmod +x composer.phar && m
 #RUN php -r "unlink('composer-setup.php');"
 
 # go/golang toolchain setup
-RUN wget --no-check-certificate "https://storage.googleapis.com/golang/go1.9.linux-amd64.tar.gz" && tar -C /usr/local -xzf go1.9.linux-amd64.tar.gz && rm go1.9.linux-amd64.tar.gz
-#RUN wget --no-check-certificate "https://storage.googleapis.com/golang/go1.9.linux-386.tar.gz" && tar -C /usr/local -xzf go1.9.linux-386.tar.gz && go1.9.linux-386.tar.gz
+RUN wget "https://storage.googleapis.com/golang/go1.10.3.linux-amd64.tar.gz" && tar -C /usr/local -xzf go1.10.3.linux-amd64.tar.gz && rm go1.10.3.linux-amd64.tar.gz
+#RUN wget "https://storage.googleapis.com/golang/go1.10.3.linux-386.tar.gz" && tar -C /usr/local -xzf go1.10.3.linux-386.tar.gz && go1.10.3.linux-386.tar.gz
 # need to pass in a volume mapping of host path to fixed docker path for go-based source code referencing
 ENV GOPATH /data/go
 
