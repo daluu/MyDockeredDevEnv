@@ -1,2 +1,4 @@
 # MyDockeredDevEnv
-Docker image spec for my various dev uses/activities
+Docker image specs for my various dev uses/activities.
+
+Also including vagrant specs too.

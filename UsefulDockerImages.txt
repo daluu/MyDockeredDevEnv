@@ -1,16 +1,18 @@
 https://hub.docker.com/r/imageName
 
 Base images
-ubuntu:14.04,14.10
-alpine:3.2
-phusion/passenger-customizable:0.9.18
-phusion/baseimage:0.9.19
+ubuntu:version
+openjdk:8-jdk-alpine
 java:8
-node:0.12.14
 https://github.com/anapsix/docker-oracle-java8
+node:0.12.14
+python:2.7.16-slim-stretch
+python:3.7.5-slim-stretch
 
 tools
 vulpe03/cqlsh
+loivis/cqlsh
+appbaseio/mirage
 
 GUI automation
 elgalu/selenium

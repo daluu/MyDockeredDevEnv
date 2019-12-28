@@ -1,0 +1,29 @@
+FROM openjdk:8-jdk-alpine
+
+RUN mkdir -p /opt/jdev
+WORKDIR /opt/jdev
+ENV HOME /opt/jdev
+
+RUN wget http://mirrors.ibiblio.org/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz && \
+    tar -xvf apache-maven-3.6.3-bin.tar.gz && \
+    rm apache-maven-3.6.3-bin.tar.gz && \
+    mkdir /usr/local/apache-maven && \
+    mv apache-maven-3.6.3 /usr/local/apache-maven/ && \
+#    ln -s /usr/local/apache-maven/apache-maven-3.6.3/bin/mvn /usr/local/bin/mvn
+    wget "http://apache.mirrors.lucidnetworks.net/kafka/0.8.2.1/kafka_2.10-0.8.2.1.tgz" && tar xvzf kafka_2.10-0.8.2.1.tgz && rm kafka_2.10-0.8.2.1.tgz && mv kafka_2.10-0.8.2.1 /opt/kafka && \
+#    wget https://services.gradle.org/distributions/gradle-3.2.1-bin.zip && unzip gradle-3.2.1-bin.zip && rm gradle-3.2.1-bin.zip && mv gradle-3.2.1 /opt/gradle && ln -s /opt/gradle/bin/gradle /usr/local/bin/gradle
+
+ENV M2_HOME /usr/local/apache-maven/apache-maven-3.6.3
+ENV M2 $M2_HOME/bin
+ENV MAVEN_OPTS -Xms256m -Xmx512m
+ENV PATH $M2:$PATH
+# also set GRADLE_HOME=/opt/gradle, and perhaps set GRADLE_OPTS
+#ENV PATH "${PATH}:/opt/gradle/bin"
+
+ADD pom.xml /opt/jdev
+# add gradle cfg
+RUN mvn clean && mvn test
+# add gradle dependency pull
+
+# optionally remap ~/.m2/repository at startup to store/reuse from host
+# same for gradle

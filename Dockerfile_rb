@@ -1,0 +1,18 @@
+FROM ruby:2.5-slim-stretch
+
+RUN apt-get -y update && \
+    apt-get -y --force-yes --fix-missing --no-install-recommends install build-essential curl git jq nano screen tmux unzip wget zip && \
+    rm -rf /var/lib/apt/lists/* && \
+    echo 'gem: --no-document' > /etc/gemrc && \
+    gem install bundler && gem update --system
+
+RUN mkdir -p /opt/rbdev
+WORKDIR /opt/rbdev
+ENV HOME /opt/rbdev
+
+COPY Gemfile /opt/rbdev/
+RUN bundle install && \
+# more command line tools setup, dependent on the various runtimes
+    gem install slop; gem install json; gem install rest-client; && \
+    gem install riemann-client && \
+    git clone git@github.com:assaf/uuid.git && mv uuid /opt/rbdev/
