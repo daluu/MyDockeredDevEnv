@@ -7,7 +7,7 @@ numpy>=1.8.0
 placebo==0.8.1
 psycopg2==2.5.3
 python-dateutil
-PyYAML==3.11
+PyYAML==5.1
 redis==2.10.5
 requests>=2.13.0
 riemann-client==6.1.2
