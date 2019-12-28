@@ -11,13 +11,14 @@ RUN apt-get install -y software-properties-common
 
 # *nix toolchain tools (and other CLI tools) setup
 # general tools
-#RUN apt-get install -y bsdmainutils ca-certificates curl heirloom-mailx jq ministat nano screen shellcheck tmux unzip vim wget
-RUN apt-get install -y bsdmainutils ca-certificates curl heirloom-mailx jq ministat nano screen tmux unzip vim wget
+#RUN apt-get install -y bsdmainutils ca-certificates curl heirloom-mailx jq ministat nano screen shellcheck tmux unzip vim wget zip
+RUN apt-get install -y bsdmainutils ca-certificates curl heirloom-mailx jq ministat nano screen tmux unzip vim wget zip
 RUN wget "https://github.com/harelba/packages-for-q/raw/master/deb/q-text-as-data_1.5.0-1_all.deb?source=install_page&table=1" -O q.deb && dpkg -i q.deb && rm q.deb
 # specialty tools
 RUN wget "http://apache.mirrors.lucidnetworks.net/kafka/0.8.2.1/kafka_2.10-0.8.2.1.tgz" && tar xvzf kafka_2.10-0.8.2.1.tgz && rm kafka_2.10-0.8.2.1.tgz && mv kafka_2.10-0.8.2.1 /opt/kafka
 #RUN apt-get -y install librdkafka-dev libyajl-dev && apt-get -y install kafkacat
 #RUN wget "https://github.com/edenhill/kafkacat/archive/1.2.0.tar.gz" -O kafkacat.tar.gz && tar xvzf kafkacat.tar.gz && cd kafkacat-1.2.0 && ./bootstrap.sh && cd ../ && rm -rf kafkacat-1.2.0 && rm kafkacat.tar.gz
+#?: dos2unix, bash4, md5sha1sum, pcre?, openssl, readline, rlwrap, watch, pkg-config
 
 # SCM toolchain setup
 RUN apt-get install -y git
@@ -116,6 +117,9 @@ COPY package.json /opt/working/
 RUN npm install
 COPY requirements.txt /opt/working/
 RUN pip install -r requirements.txt
+ADD Makefile /opt/working
+RUN make venv
+# ^^ or virtualenv venv
 COPY Gemfile /opt/working/
 RUN source /usr/local/rvm/scripts/rvm && bundle install
 COPY composer.json /opt/working/

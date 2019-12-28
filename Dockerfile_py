@@ -1,0 +1,25 @@
+#FROM python:2.7.16-slim-stretch
+FROM python:3.7.5-slim-stretch
+
+RUN mkdir -p /opt/pydev
+WORKDIR /opt/pydev
+ENV HOME /opt/pydev
+RUN apt-get -y update && \
+    apt-get -y --force-yes --fix-missing --no-install-recommends install build-essential curl git jq nano screen tmux unzip wget zip && \
+    rm -rf /var/lib/apt/lists/* && \
+    pip install -U pip wheel setuptools tox virtualenv && \
+#    apt-get remove -y build-essential && apt-get -y autoremove && \
+# ^^ normally we remove, but we keep the dev build tools around for any python dependencies
+# that require them for install for the base python env and virtualenv
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+ADD requirements.txt /opt/pydev/
+RUN pip install --no-cache-dir -r requirements.txt && \
+    pip install chardet && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    git clone git@github.com:davidmalcolm/squeal && mv squeal /opt/pydev/ && \
+    git clone git@github.com:gh2o/rvi_capture.git && mv rvi_capture /opt/pydev/ && \
+    git clone git@github.com:magnetikonline/py-encoding-detect.git && mv py-encoding-detect /opt/pydev/ && \
+    git clone git@github.com:au-answers/encoding-check.git && mv encoding-check /opt/pydev/
+# and grab this file here: https://thrysoee.dk/iospcap/
+
+#ADD . /opt/pydev/

@@ -1,0 +1,33 @@
+FROM ubuntu:16.04
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh && \
+    apt-get update -y && \
+    apt-get install -y software-properties-common && \
+    # base tooling
+    apt-get install -y bsdmainutils ca-certificates curl git heirloom-mailx jq ministat nano screen tmux unzip vim wget zip && \
+    # for access to gcc/C/C++/make tools
+    apt-get install -y --reinstall autoconf automake build-essential libprotobuf-dev libsnappy-dev libtool make g++ protobuf-compiler gcc-4.8 && \
+    # go/golang toolchain setup
+    wget "https://dl.google.com/go/go1.13.3.linux-amd64.tar.gz" && tar -C /usr/local -xzf go1.13.3.linux-amd64.tar.gz && rm go1.13.3.linux-amd64.tar.gz
+    #wget "https://dl.google.com/go/go1.13.3.linux-386.tar.gz" && tar -C /usr/local -xzf go1.13.3.linux-386.tar.gz && rm go1.13.3.linux-386.tar.gz
+    # additional tools
+    wget "https://github.com/harelba/packages-for-q/raw/master/deb/q-text-as-data_1.5.0-1_all.deb?source=install_page&table=1" -O q.deb && dpkg -i q.deb && rm q.deb && \
+    apt-get -y install librdkafka-dev libyajl-dev && apt-get -y install kafkacat && \
+    #wget "https://github.com/edenhill/kafkacat/archive/1.2.0.tar.gz" -O kafkacat.tar.gz && tar xvzf kafkacat.tar.gz && cd kafkacat-1.2.0 && ./bootstrap.sh && cd ../ && rm -rf kafkacat-1.2.0 && rm kafkacat.tar.gz && \
+    # other tools to install?...
+    # shellcheck, dos2unix, bash4, md5sha1sum, pcre?, openssl, readline, rlwrap, watch, pkg-config, cvs, mercurial, svn
+
+# add system go bin & user's (mapped) go bin paths to PATH
+ENV PATH "${PATH}:/usr/local/go/bin:/data/go/bin"
+ENV GOPATH /data/go
+# define any private git repos for go mod dependency versioning to work with
+#ENV GOPRIVATE github.com/user1/repos*,github.com/user2/repo2,...
+
+# set up working path
+RUN mkdir -p /opt/working/
+WORKDIR /opt/working/
+ENV HOME /opt/working/
+
+#ADD . /opt/working
