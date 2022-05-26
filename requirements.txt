@@ -12,6 +12,6 @@ redis==2.10.5
 requests>=2.13.0
 riemann-client==6.1.2
 selenium>=2.48.0
-ujson==1.35
+ujson==5.2.0
 unittest-xml-reporting
 # pip install -r requirements.txt
