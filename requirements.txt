@@ -8,7 +8,7 @@ placebo==0.8.1
 psycopg2==2.5.3
 python-dateutil
 pyyaml>=4.2b1
-redis==2.10.5
+redis==4.5.3
 requests>=2.13.0
 riemann-client==6.1.2
 selenium>=2.48.0
